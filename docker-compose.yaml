@@ -6,7 +6,7 @@ services:
     ports:
       - 9090:9090
     volumes:
-      - ./prometheus:/etc/prometheus
+      - ./prometheus:/etc/monitoring/prometheus
       - /var/lib/prometheus:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
