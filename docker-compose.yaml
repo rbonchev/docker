@@ -3,12 +3,68 @@ version: '3'
 services:
   prometheus:
     image: prom/prometheus:v2.44.0
+    user: root
     ports:
       - 9090:9090
     volumes:
-      - ./prometheus:/etc/monitoring/prometheus
+      - /etc/monitoring/prometheus:/etc/prometheus
       - /var/lib/prometheus:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
       - '--web.enable-lifecycle'
+
+# alertmanager:
+#     image: prom/alertmanager:v0.23.0
+#     user: root
+#     ports:
+#       - 9093:9093
+#     volumes:
+#       - ./alertmanager:/etc/alertmanager
+#     command:
+#       - '--config.file=/etc/alertmanager/config.yml'
+#     networks:
+#       - monitoring_default
+
+  # loki:
+  #   image: grafana/loki:latest
+  #   user: root
+  #   ports:
+  #     - 3100:3100
+  #   volumes:
+  #     - ./loki:/etc/loki
+  #   command:
+  #     - '-config.file=/etc/loki/local-config.yaml'
+  #   networks:
+  #     - monitoring_default
+
+  grafana:
+    image: grafana/grafana:9.5.2
+    user: root
+    ports:
+      - 3000:3000
+    volumes:
+      - ./grafana:/var/lib/grafana
+      - /var/lib/grafana:/var/lib/grafana
+    depends_on:
+      - prometheus
+#      - loki
+
+  influxdb:
+    image: influxdb:2.7.1
+    user: root
+    ports:
+      - 8086:8086
+    volumes:
+      - /var/lib/influxdb:/var/lib/influxdb
+
+  # minio:
+  #   image: minio/minio:latest
+  #   user: root
+  #   ports:
+  #     - 9000:9000
+  #   environment:
+  #     - MINIO_ACCESS_KEY=minio
+  #     - MINIO_SECRET_KEY=minio123
+  #   volumes:
+  #     - ./minio:/data
